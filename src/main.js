@@ -7,6 +7,7 @@ import { initData } from "./data.js";
 import { processFormData } from "./lib/utils.js";
 
 import { initTable } from "./components/table.js";
+import { initPagination } from "./components/pagination.js";
 // @todo: подключение
 
 // Исходные данные используемые в render()
@@ -47,6 +48,18 @@ const sampleTable = initTable(
 );
 
 // @todo: инициализация
+const applyPagination = initPagination(
+  sampleTable.pagination.elements, // передаём сюда элементы пагинации, найденные в шаблоне
+  (el, page, isCurrent) => {
+    // и колбэк, чтобы заполнять кнопки страниц данными
+    const input = el.querySelector("input");
+    const label = el.querySelector("span");
+    input.value = page;
+    input.checked = isCurrent;
+    label.textContent = page;
+    return el;
+  }
+);
 
 const appRoot = document.querySelector("#app");
 appRoot.appendChild(sampleTable.container);
