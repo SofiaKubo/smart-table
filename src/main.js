@@ -91,9 +91,7 @@ const applyFiltering = initFiltering(sampleTable.filter.elements, {
 });
 
 // Инициализируем поиск
-const applySearching = initSearching(
-  sampleTable.search.elements.searchField // передаём поле поиска
-);
+const applySearching = initSearching("search"); // передаём ИМЯ ПОЛЯ 'search'
 
 const appRoot = document.querySelector("#app");
 appRoot.appendChild(sampleTable.container);
