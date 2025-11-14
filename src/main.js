@@ -10,6 +10,7 @@ import { initTable } from "./components/table.js";
 import { initPagination } from "./components/pagination.js";
 import { initSorting } from "./components/sorting.js";
 import { initFiltering } from "./components/filtering.js";
+import { initSearching } from "./components/searching.js";
 // @todo: подключение
 
 // Исходные данные используемые в render()
@@ -42,6 +43,7 @@ function render(action) {
   let result = [...data]; // копируем для последующего изменения
 
   // @todo: использование
+  result = applySearching(result, state, action); // применяем поиск
   result = applyFiltering(result, state, action); // применяем фильтрацию
   result = applySorting(result, state, action); // применяем сортировку
   result = applyPagination(result, state, action); // применяем пагинацию
@@ -55,7 +57,7 @@ const sampleTable = initTable(
   {
     tableTemplate: "table",
     rowTemplate: "row",
-    before: ["header", "filter"],
+    before: ["search", "header", "filter"],
     after: ["pagination"],
   },
   render
@@ -87,6 +89,11 @@ const applyFiltering = initFiltering(sampleTable.filter.elements, {
   // передаём элементы фильтра
   searchBySeller: indexes.sellers, // для элемента с именем searchBySeller устанавливаем массив продавцов
 });
+
+// Инициализируем поиск
+const applySearching = initSearching(
+  sampleTable.search.elements.searchField // передаём поле поиска
+);
 
 const appRoot = document.querySelector("#app");
 appRoot.appendChild(sampleTable.container);
