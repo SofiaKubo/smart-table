@@ -20,8 +20,14 @@ const { data, ...indexes } = initData(sourceData);
 function collectState() {
   const state = processFormData(new FormData(sampleTable.container));
 
+  // Преобразуем строковые значения в числа
+  const rowsPerPage = parseInt(state.rowsPerPage); // количество строк на странице
+  const page = parseInt(state.page ?? 1); // номер страницы (по умолчанию 1)
+
   return {
-    ...state,
+    ...state, // все остальные поля остаются как есть
+    rowsPerPage, // перезаписываем числовым значением
+    page, // перезаписываем числовым значением
   };
 }
 
@@ -33,6 +39,9 @@ function render(action) {
   let state = collectState(); // состояние полей из таблицы
   let result = [...data]; // копируем для последующего изменения
   // @todo: использование
+  result = applyPagination(result, state, action); // применяем пагинацию
+
+  // Отображаем результат в таблице
 
   sampleTable.render(result);
 }
