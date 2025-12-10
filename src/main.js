@@ -38,21 +38,21 @@ function collectState() {
  * Перерисовка состояния таблицы при любых изменениях
  * @param {HTMLButtonElement?} action
  */
-async function render() {
+async function render(action) {
   let state = collectState(); // состояние полей из таблицы
-  let query = {}; // объект с параметрами запроса
+  let query = {}; // объект с параметрами запроса, здесь будут формироваться параметры запроса к серверу
 
   // Формируем параметры запроса на основе состояния таблицы
 
-  // @todo: использование
   // result = applySearching(result, state, action); // применяем поиск
   // result = applyFiltering(result, state, action); // применяем фильтрацию
   // result = applySorting(result, state, action); // применяем сортировку
-  // result = applyPagination(result, state, action); // применяем пагинацию
-  const { total, items } = await api.getRecords(query);
+  query = applyPagination(query, state, action); // обновляем query с учётом пагинации
+
+  const { total, items } = await api.getRecords(query); // запрашиваем данные с собранными параметрами
+  updatePagination(total, query); // перерисовываем пагинатор
 
   // Отображаем результат в таблице
-
   sampleTable.render(items);
 }
 
@@ -67,7 +67,7 @@ const sampleTable = initTable(
 );
 
 // @todo: инициализация
-const applyPagination = initPagination(
+const { applyPagination, updatePagination } = initPagination(
   sampleTable.pagination.elements, // передаём сюда элементы пагинации, найденные в шаблоне
   (el, page, isCurrent) => {
     // и колбэк, чтобы заполнять кнопки страниц данными
