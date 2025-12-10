@@ -43,10 +43,10 @@ function render(action) {
   let result = [...data]; // копируем для последующего изменения
 
   // @todo: использование
-  result = applySearching(result, state, action); // применяем поиск
-  result = applyFiltering(result, state, action); // применяем фильтрацию
-  result = applySorting(result, state, action); // применяем сортировку
-  result = applyPagination(result, state, action); // применяем пагинацию
+  // result = applySearching(result, state, action); // применяем поиск
+  // result = applyFiltering(result, state, action); // применяем фильтрацию
+  // result = applySorting(result, state, action); // применяем сортировку
+  // result = applyPagination(result, state, action); // применяем пагинацию
 
   // Отображаем результат в таблице
 
@@ -85,10 +85,10 @@ const applySorting = initSorting([
 ]);
 
 // Инициализируем фильтрацию
-const applyFiltering = initFiltering(sampleTable.filter.elements, {
-  // передаём элементы фильтра
-  searchBySeller: indexes.sellers, // для элемента с именем searchBySeller устанавливаем массив продавцов
-});
+// const applyFiltering = initFiltering(sampleTable.filter.elements, {
+//   // передаём элементы фильтра
+//   searchBySeller: indexes.sellers, // для элемента с именем searchBySeller устанавливаем массив продавцов
+// });
 
 // Инициализируем поиск
 const applySearching = initSearching("search"); // передаём ИМЯ ПОЛЯ 'search'
