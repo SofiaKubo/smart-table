@@ -1,7 +1,10 @@
-// Функции для работы с фильтрацией данных в таблице
-
-// @todo: #4.1 — заполнить выпадающие списки опциями
+// Работа с фильтрацией данных в таблице
 export function initFiltering(elements) {
+  /**
+   * Заполнение выпадающих списков (select) значениями,
+   * полученными с сервера — например, списком продавцов.
+   * indexes — объект вида { searchBySeller: {id: 'Имя', ...} }
+   */
   const updateIndexes = (elements, indexes) => {
     Object.keys(indexes).forEach((elementName) => {
       elements[elementName].append(
@@ -15,35 +18,46 @@ export function initFiltering(elements) {
     });
   };
 
+  /**
+   * Формирование параметров фильтрации для запроса к серверу.
+   * Здесь больше нет локальной фильтрации — мы только собираем query.
+   */
   const applyFiltering = (query, state, action) => {
-    // код с обработкой очистки поля
-
-    // @todo: #4.2 — обработать очистку поля
+    /**
+     * Обработка очистки поля фильтра.
+     * Кнопка "clear" сбрасывает value у input/select.
+     */
     if (action && action.name === "clear") {
-      const field = action.dataset.field;
       const parent = action.parentElement;
       const control = parent.querySelector("input, select");
+
       if (control) {
         control.value = "";
       }
     }
-    // @todo: #4.5 — отфильтровать данные, используя компаратор
+
+    /**
+     * Формирование объекта filter[...] для запроса.
+     * Находим все input/select внутри фильтра,
+     * собираем их значения и превращаем их в query-параметры.
+     *
+     * Пример:
+     *   filter[seller]=Иван Петров
+     */
     const filter = {};
+
     Object.keys(elements).forEach((key) => {
-      if (elements[key]) {
-        if (
-          ["INPUT", "SELECT"].includes(elements[key].tagName) &&
-          elements[key].value
-        ) {
-          // ищем поля ввода в фильтре с непустыми данными
-          filter[`filter[${elements[key].name}]`] = elements[key].value; // чтобы сформировать в query вложенный объект фильтра
-        }
+      const el = elements[key];
+
+      if (el && ["INPUT", "SELECT"].includes(el.tagName) && el.value) {
+        filter[`filter[${el.name}]`] = el.value;
       }
     });
 
+    // Если фильтры есть — добавляем их в query. Если нет — возвращаем исходный query.
     return Object.keys(filter).length
       ? Object.assign({}, query, filter)
-      : query; // если в фильтре что-то добавилось, применим к запросу
+      : query;
   };
 
   return {
