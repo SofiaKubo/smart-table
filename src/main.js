@@ -47,7 +47,7 @@ async function render(action) {
   let query = {}; // объект с параметрами запроса, здесь будут формироваться параметры запроса к серверу
 
   // Формируем параметры запроса на основе состояния таблицы
-  // result = applySearching(result, state, action); // применяем поиск
+  query = applySearching(query, state, action); // применяем поиск
   query = applyFiltering(query, state, action); // применяем фильтрацию
   // result = applySorting(result, state, action); // применяем сортировку
   query = applyPagination(query, state, action); // обновляем query с учётом пагинации
