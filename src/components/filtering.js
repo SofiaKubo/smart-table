@@ -1,57 +1,67 @@
-import { createComparison, defaultRules } from "../lib/compare.js";
+// Работа с фильтрацией данных в таблице
+export function initFiltering(elements) {
+  /**
+   * Заполнение выпадающих списков (select) значениями,
+   * полученными с сервера — например, списком продавцов.
+   * indexes — объект вида { searchBySeller: {id: 'Имя', ...} }
+   */
+  const updateIndexes = (elements, indexes) => {
+    Object.keys(indexes).forEach((elementName) => {
+      elements[elementName].append(
+        ...Object.values(indexes[elementName]).map((name) => {
+          const el = document.createElement("option");
+          el.textContent = name;
+          el.value = name;
+          return el;
+        })
+      );
+    });
+  };
 
-export function initFiltering(elements, indexes) {
-  // @todo: #4.1 — заполнить выпадающие списки опциями
-  Object.keys(indexes).forEach((elementName) => {
-    elements[elementName].append(
-      ...Object.values(indexes[elementName]).map((name) => {
-        const option = document.createElement("option");
-        option.value = name;
-        option.textContent = name;
-        return option;
-      })
-    );
-  });
-
-  // @todo: #4.3 — настроить компаратор
-  const compare = createComparison(defaultRules);
-
-  return (data, state, action) => {
-    // @todo: #4.2 — обработать очистку поля
+  /**
+   * Формирование параметров фильтрации для запроса к серверу.
+   * Здесь больше нет локальной фильтрации — мы только собираем query.
+   */
+  const applyFiltering = (query, state, action) => {
+    /**
+     * Обработка очистки поля фильтра.
+     * Кнопка "clear" сбрасывает value у input/select.
+     */
     if (action && action.name === "clear") {
-      const field = action.dataset.field;
       const parent = action.parentElement;
-      const input = parent.querySelector("input");
+      const control = parent.querySelector("input, select");
 
-      if (input) {
-        input.value = "";
-        state[field] = "";
+      if (control) {
+        control.value = "";
       }
     }
 
-    // @todo: #4.5 — отфильтровать данные используя компаратор
-    // Фильтрация данных
-    return data.filter((row) => {
-      // Сначала применяем стандартный компаратор
-      if (!compare(row, state)) {
-        return false;
+    /**
+     * Формирование объекта filter[...] для запроса.
+     * Находим все input/select внутри фильтра,
+     * собираем их значения и превращаем их в query-параметры.
+     *
+     * Пример:
+     *   filter[seller]=Иван Петров
+     */
+    const filter = {};
+
+    Object.keys(elements).forEach((key) => {
+      const el = elements[key];
+
+      if (el && ["INPUT", "SELECT"].includes(el.tagName) && el.value) {
+        filter[`filter[${el.name}]`] = el.value;
       }
-
-      // Дополнительная проверка диапазона Total
-      if (state.totalFrom || state.totalTo) {
-        const total = parseFloat(row.total);
-
-        // Проверка минимума
-        if (state.totalFrom && total < parseFloat(state.totalFrom)) {
-          return false;
-        }
-
-        // Проверка максимума
-        if (state.totalTo && total > parseFloat(state.totalTo)) {
-          return false;
-        }
-      }
-      return true;
     });
+
+    // Если фильтры есть — добавляем их в query. Если нет — возвращаем исходный query.
+    return Object.keys(filter).length
+      ? Object.assign({}, query, filter)
+      : query;
+  };
+
+  return {
+    updateIndexes,
+    applyFiltering,
   };
 }
