@@ -49,7 +49,7 @@ async function render(action) {
   // Формируем параметры запроса на основе состояния таблицы
   query = applySearching(query, state, action); // применяем поиск
   query = applyFiltering(query, state, action); // применяем фильтрацию
-  // result = applySorting(result, state, action); // применяем сортировку
+  query = applySorting(query, state, action); // применяем сортировку
   query = applyPagination(query, state, action); // обновляем query с учётом пагинации
 
   const { total, items } = await api.getRecords(query); // запрашиваем данные с собранными параметрами
